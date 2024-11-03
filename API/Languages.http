@@ -1,0 +1,6 @@
+@Languages_HostAddress = http://localhost:5118
+
+GET {{Languages_HostAddress}}
+Accept: application/json
+
+###

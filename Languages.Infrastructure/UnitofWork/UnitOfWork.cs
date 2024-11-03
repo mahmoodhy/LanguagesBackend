@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,15 +21,14 @@ namespace Infrastructure.UnitofWork
             ApiDictionaryRoot = new ApiDictionaryRepository(_context);
             userBox= new UserBoxRepository(_context);
             userBoxView = new UserBoxViewRepository(_context);
-            
+            //newline1
         }
         public IBoxDataRepository BoxData { get; private set; }
 
         public IApiDictionaryRepository ApiDictionaryRoot { get; private set; }
         public IUserBoxRepository userBox { get; private set; }
         public IUserBoxViewRepository userBoxView { get; }
-
-
+        //newline2
 
         public int Complete()
         {
@@ -41,3 +40,4 @@ namespace Infrastructure.UnitofWork
         }
     }
 }
+

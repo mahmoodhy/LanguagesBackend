@@ -18,5 +18,6 @@ namespace Core.Interfaces.Repository
         Task<bool> IsTodayFinished(string username);
         Task<UserBox?> GetWordByBoxIdAsync(int wordBoxId);
         Task<UserBox?> FindWordAsync(string word,string UserName);
+
     }
 }

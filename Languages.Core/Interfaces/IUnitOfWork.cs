@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +13,8 @@ namespace Core.Interfaces
         IApiDictionaryRepository ApiDictionaryRoot { get; }
         IUserBoxRepository userBox { get; }
         IUserBoxViewRepository userBoxView { get; }
+        //newline
         int Complete();
     }
 }
+

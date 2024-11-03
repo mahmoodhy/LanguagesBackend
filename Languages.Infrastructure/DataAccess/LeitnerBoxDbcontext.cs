@@ -34,6 +34,7 @@ namespace Infrastructure.DataAccess
         public DbSet<SimiliarWords> similiarWords { get; set; }
         public DbSet<SearchedWord> searchedWords { get; set; }
         public DbSet<UserBoxView>? userBoxView { get; set; }
+        public virtual DbSet<UserBoxStatistic> UserBoxStatistics { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -60,6 +61,14 @@ namespace Infrastructure.DataAccess
               .HasNoKey();
             modelBuilder.Entity<SearchedWord>()
             .HasNoKey();
+            modelBuilder.Entity<UserBoxStatistic>(entity =>
+            {
+                entity
+                    .HasNoKey()
+                    .ToView("UserBoxStatistics", "LeitnerBox");
+
+                entity.Property(e => e.UserName).HasMaxLength(50);
+            });
         }
 
         public LeitnerBoxDbcontext CreateDbContext(string[] args)

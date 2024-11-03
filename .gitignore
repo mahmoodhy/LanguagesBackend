@@ -364,3 +364,5 @@ FodyWeavers.xsd
 /API/appsettings.json
 /API/Dockerfile
 /API/appsettings.Development.json
+/add.bat
+/add.ps1

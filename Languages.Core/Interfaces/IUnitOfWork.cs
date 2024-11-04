@@ -13,8 +13,10 @@ namespace Core.Interfaces
         IApiDictionaryRepository ApiDictionaryRoot { get; }
         IUserBoxRepository userBox { get; }
         IUserBoxViewRepository userBoxView { get; }
+        IUserBoxStatisticRepository userboxstatistics { get; }
         //newline
         int Complete();
     }
 }
+
 

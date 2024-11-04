@@ -346,5 +346,11 @@ namespace Languages.Controllers
             var file = await _mediator.Send(new AddWordtoUserBox() { WordId = boxid, userName= _username });
             return Ok(file);
         }
+        [HttpPost]
+        public async Task<IActionResult> GetUserBoxWordsStatistics()
+        {
+            var file = await _mediator.Send(new GetUserBoxWordsStatistics() {  userName = _username });
+            return Ok(file);
+        }
     }
 }

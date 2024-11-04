@@ -14,30 +14,28 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Application.CQRS.Command
 {
-    public class AddWordtoUserBox : IRequest<Unit>
+    public class AddNewWordtoBox : IRequest<int>
     {
-        public int WordId { get; set; }
-        public string userName { get; set; }
+        public BoxData WordBox { get; set; }
 
-        internal class AddWordtoUserBoxHandler : IRequestHandler<AddWordtoUserBox, Unit>
+        internal class AddNewWordtoBoxHandler : IRequestHandler<AddNewWordtoBox, int>
         {
             private readonly IUnitOfWork _unitOfWork;
 
-            public AddWordtoUserBoxHandler(IUnitOfWork unitOfWork)
+            public AddNewWordtoBoxHandler(IUnitOfWork unitOfWork)
             {
                 _unitOfWork = unitOfWork;
 
             }
-            public async Task<Unit> Handle(AddWordtoUserBox command, CancellationToken cancellationToken)
+            public async Task<int> Handle(AddNewWordtoBox command, CancellationToken cancellationToken)
             {
                 try
                 {
-                    var newUserBox = new UserBox() { BoxDay = 0, BoxId = command.WordId, userName = command.userName, working=1 };
-                    _unitOfWork.userBox.Add(newUserBox);
+                    _unitOfWork.BoxData.Add(command.WordBox);
                     _unitOfWork.Complete();
 
 
-                    return Unit.Value;
+                    return command.WordBox.id;
                 }
                 catch (Exception ex) { throw new Exception(ex.Message); }
             }

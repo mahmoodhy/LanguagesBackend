@@ -16,6 +16,8 @@ namespace Core.Entities
         public string? Type { get; set; }
         public int Priority { get; set; }
         public int? Rank { get; set; }
+        public bool IsActive { get; set; }
+        public Guid? UserId { get; set; }
 
     }
 }

@@ -98,9 +98,7 @@ namespace Core.Entities
         public string word { get; set; }
         public string? officialTranslate { get; set; }
 
-        //public string? YourTranslate { get; set; }
-        //public string? GTAnswer { get; set; }
-
+       
     }
     public class SearchedWord
     {
@@ -109,7 +107,6 @@ namespace Core.Entities
         public string word { get; set; }
         public string? officialTranslate { get; set; }
         public List<SimiliarWords>? similiarWords { get; set; }
-
 
     }
 }

@@ -18,7 +18,7 @@ namespace Infrastructure.Repository
         }
         public async Task<BoxData?> FindWordAsync(string word)
         {
-            var Findingword = await _context.Box.Where(x => x.EnglishWord == word).FirstOrDefaultAsync();
+            var Findingword = await _context.Box.Where(x => x.EnglishWord == word && x.IsActive==true).FirstOrDefaultAsync();
             return Findingword;
         }
 

@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Cors;
 using Application.FrameWork;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Permissions;
+using System.Security.Cryptography;
 
 
 namespace Languages.Controllers
@@ -34,7 +35,7 @@ namespace Languages.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private string _username;
+        private ApplicationUser _user;
         private IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -47,36 +48,36 @@ namespace Languages.Controllers
             _roleManager = roleManager;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
-            _username = _httpContextAccessor.HttpContext.User.Identity.Name;
             
+            _user = _userManager.FindByNameAsync(_httpContextAccessor.HttpContext.User.Identity.Name).Result;
 
-            //_username = "me";
+          
         }
 
         [HttpPost]
         public async Task<IActionResult> StartNewDay(int wordcount, bool? Force)
         {
-            var todaywords = await _mediator.Send(new GetTodayWordsRemainingIds() { UserName = _username });
+            var todaywords = await _mediator.Send(new GetTodayWordsRemainingIds() { UserName = _user.UserName });
             if (todaywords.Count > 0)
                 return Ok(todaywords.Count);
-            var isTodayFinished = await _mediator.Send(new IsTodayFinished() { UserName = _username });
+            var isTodayFinished = await _mediator.Send(new IsTodayFinished() { UserName = _user.UserName });
             if (isTodayFinished && !(Force ?? false))
                 return Ok(0);
-            var newdaywors = await _mediator.Send(new GetAllWordsOfToday() { WordsCount = wordcount, UserName = _username });
-            await _mediator.Send(new UpdateTodayWordsBoxNumber() { Words = newdaywors, UserName = _username });
+            var newdaywors = await _mediator.Send(new GetAllWordsOfToday() { WordsCount = wordcount, UserName = _user.UserName });
+            await _mediator.Send(new UpdateTodayWordsBoxNumber() { Words = newdaywors, UserName = _user.UserName });
             return Ok(newdaywors.Count);
         }
         [HttpPost]
         public async Task<IActionResult> GetTodayWordsRemainingIds()
         {
 
-            var wordCount = await _mediator.Send(new GetTodayWordsRemainingIds() { UserName = _username });
+            var wordCount = await _mediator.Send(new GetTodayWordsRemainingIds() { UserName = _user.UserName });
             return Ok(wordCount);
         }
         [HttpPost]
         public async Task<IActionResult> IsTodayFinished()
         {
-            var isTodayFinished = await _mediator.Send(new IsTodayFinished() { UserName = _username });
+            var isTodayFinished = await _mediator.Send(new IsTodayFinished() { UserName = _user.UserName });
             return Ok(isTodayFinished);
         }
 
@@ -136,25 +137,25 @@ namespace Languages.Controllers
         [HttpPost]
         public async Task<IActionResult> NextRandomWord()
         {
-            var randomWord = await _mediator.Send(new GetOnerandomWordforToday() { UserName = _username });
+            var randomWord = await _mediator.Send(new GetOnerandomWordforToday() { UserName = _user.UserName });
             return Ok(randomWord);
         }
         [HttpPost]
         public async Task<IActionResult> CorrectAnswer(int wordId)
         {
-            await _mediator.Send(new SetCorrectAnswer() { WordId = wordId, UserName = _username });
+            await _mediator.Send(new SetCorrectAnswer() { WordId = wordId, UserName = _user.UserName });
             return Ok();
         }
         [HttpPost]
         public async Task<IActionResult> WrongAnswer(int wordId)
         {
-            await _mediator.Send(new SetWrongAnswer() { WordId = wordId, UserName = _username });
+            await _mediator.Send(new SetWrongAnswer() { WordId = wordId, UserName = _user.UserName });
             return Ok();
         }
         [HttpPost]
         public async Task<IActionResult> ThisWordIsLearned(int wordId)
         {
-            await _mediator.Send(new SetThisWordIsLearned() { WordId = wordId, UserName = _username });
+            await _mediator.Send(new SetThisWordIsLearned() { WordId = wordId, UserName = _user.UserName });
             return Ok();
         }
         [HttpPost]
@@ -166,7 +167,7 @@ namespace Languages.Controllers
             try
             {
                 var resultword = new SearchedWord();
-                var userboxviewWord = await _mediator.Send(new FindWordInUserBox() { Word = word, UserName = _username });
+                var userboxviewWord = await _mediator.Send(new FindWordInUserBox() { Word = word, UserName = _user.UserName });
                 if (userboxviewWord != null)
                 {
                     if (string.IsNullOrWhiteSpace(userboxviewWord.PersianWords))
@@ -205,6 +206,12 @@ namespace Languages.Controllers
             {
                 return BadRequest(ex.Message + "->  " + ex.InnerException);
             }
+        }
+        [HttpPost("{word}")]
+        public async Task<IActionResult> FindSimiliarWordsSoundex(string word)
+        {
+            var similiarWords = await _mediator.Send(new FindSimiliarWordsSoundex() { Word = word });
+            return Ok(similiarWords);
         }
         [HttpPost("{word}")]
         public async Task<IActionResult> GetsimiliarwordsinDataBase(string word)
@@ -343,13 +350,28 @@ namespace Languages.Controllers
         [HttpPost("{boxid}")]
         public async Task<IActionResult> AddWordtoUserBox(int boxid)
         {
-            var file = await _mediator.Send(new AddWordtoUserBox() { WordId = boxid, userName= _username });
+            var file = await _mediator.Send(new AddWordtoUserBox() { WordId = boxid, userName= _user.UserName });
             return Ok(file);
+        }
+        [HttpPost("{word}")]
+        public async Task<IActionResult> AddNewWordtoBox(string word)
+        {
+            var newWordBox=new BoxData() { EnglishWord= word, IsActive=false, PersianWords= await _mediator.Send(new GetWordFromGoogleTranslateByWord() { Word=word})
+            , Type="UserAdded", UserId= Guid.Parse(_user.Id), Priority=0};
+            var newWordBoxId = await _mediator.Send(new AddNewWordtoBox() { WordBox = newWordBox });
+            await _mediator.Send(new AddWordtoUserBox() { WordId = newWordBoxId, userName = _user.UserName });
+            return Ok();
         }
         [HttpPost]
         public async Task<IActionResult> GetUserBoxWordsStatistics()
         {
-            var file = await _mediator.Send(new GetUserBoxWordsStatistics() {  userName = _username });
+            var file = await _mediator.Send(new GetUserBoxWordsStatistics() {  userName = _user.UserName });
+            return Ok(file);
+        }
+        [HttpPost("{userboxid}")]
+        public async Task<IActionResult> SetWordLearnedPermanently(int userboxid)
+        {
+            var file = await _mediator.Send(new SetWordLearnedPermanently() { WordId = userboxid, UserName = _user.UserName });
             return Ok(file);
         }
     }

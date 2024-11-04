@@ -15,45 +15,28 @@ using System.Text.RegularExpressions;
 
 namespace Application.CQRS.Query
 {
-    public class FindSearchedWord : IRequest<SearchedWord>
+    public class FindSimiliarWordsSoundex : IRequest<List<SimiliarWords>>
     {
         public string Word { get; set; }
 
-        internal class FindSearchedWordHandler : IRequestHandler<FindSearchedWord, SearchedWord>
+        internal class FindSimiliarWordsSoundexHandler : IRequestHandler<FindSimiliarWordsSoundex, List<SimiliarWords>>
         {
             private readonly IUnitOfWork _unitOfWork;
             private readonly ILeitnerBoxDbcontext _dbContext;
             private readonly IMediator _mediator;
 
 
-            public FindSearchedWordHandler(IUnitOfWork unitOfWork, ILeitnerBoxDbcontext dbContext, IMediator mediator)
+            public FindSimiliarWordsSoundexHandler(IUnitOfWork unitOfWork, ILeitnerBoxDbcontext dbContext, IMediator mediator)
             {
                 _unitOfWork = unitOfWork;
                 _dbContext = dbContext;
                 _mediator = mediator;
 
             }
-            public async Task<SearchedWord> Handle(FindSearchedWord query, CancellationToken cancellationToken)
+            public async Task<List<SimiliarWords>> Handle(FindSimiliarWordsSoundex query, CancellationToken cancellationToken)
             {
-                if (query.Word.Any(char.IsWhiteSpace))
-                {
-                    var Word = new SearchedWord()
-                    {
-                        word = query.Word,
-                        officialTranslate = await _mediator.Send(new GetWordFromGoogleTranslateByWord() { Word = query.Word })
-                    };
-                    return Word;
-                }
-                var word = await _dbContext.searchedWords.FromSqlRaw(
-                    $"SELECT" +
-                    $" null Boxday,null Boxid,EnglishWord word,PersianWords officialTranslate " +
-                    $"FROM dbo.fulldic WHERE EnglishWord = '{query.Word}'").FirstOrDefaultAsync();
-                if (word != null)
-                {
-                    if (string.IsNullOrWhiteSpace(word.officialTranslate))
-                        word.officialTranslate = await _mediator.Send(new GetWordFromGoogleTranslateByWord() { Word = query.Word });
-                    //return word;
-                }
+               
+                
                 var similiarwords = new List<SimiliarWords>();
                 if (query.Word.Length > 3)
                 {
@@ -78,14 +61,9 @@ namespace Application.CQRS.Query
                     foreach (var similiarword in similiarwords)
                         if (string.IsNullOrWhiteSpace(similiarword.officialTranslate))
                             similiarword.officialTranslate = await _mediator.Send(new GetWordFromGoogleTranslateByWord() { Word = similiarword.word });
-                word = new SearchedWord()
-                {
-                    word = query.Word,
-                    officialTranslate = await _mediator.Send(new GetWordFromGoogleTranslateByWord() { Word = query.Word }),
-                    similiarWords = similiarwords
-                };
+               
 
-                return word;
+                return similiarwords;
             }
         }
     }

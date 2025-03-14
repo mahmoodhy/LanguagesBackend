@@ -9,6 +9,7 @@ using Core.Entities;
 using Newtonsoft.Json;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using System.Net;
+using System.Net.Http.Json;
 
 namespace Application.CQRS.Query
 {
@@ -26,17 +27,21 @@ namespace Application.CQRS.Query
 
             }
             public async Task<string> Handle(GetWordFromGoogleTranslateByWord query, CancellationToken cancellationToken)
-            {    
-           
-                        var client = new HttpClient();
-                        var url = "https://one-api.ir/translate/?token=737633:647c7299736c4&action=google&source=en&lang=fa&q=";
-                        var request = new HttpRequestMessage(HttpMethod.Post, url + query.Word);
-                        var response = await client.SendAsync(request);
-                        response.EnsureSuccessStatusCode();
-                        var _wordfromgoogle = JsonConvert.DeserializeObject<GoogleTranslate>(await response.Content.ReadAsStringAsync());
-                        
-                    
-                    return _wordfromgoogle.result??"";
+            {
+
+                var client = new HttpClient();
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://api.one-api.ir/translate/v1/google/");
+                request.Headers.Add("one-api-token", "737633:647c7299736c4");
+                var content = new StringContent("{\r\n    \"source\" : \"en\",\r\n\"target\" : \"fa\",\r\n\"text\" : \" "+query.Word+" \"\r\n}", null, "application/json");
+                request.Content = content;
+                var response = await client.SendAsync(request);
+
+                response.EnsureSuccessStatusCode();
+                var result = await response.Content.ReadAsStringAsync();
+                var _wordfromgoogle = JsonConvert.DeserializeObject<GoogleTranslate>(result);
+
+
+                return _wordfromgoogle.result??"";
             }
         }
     }

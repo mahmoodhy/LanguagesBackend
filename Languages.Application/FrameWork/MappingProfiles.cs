@@ -15,6 +15,7 @@ namespace Application.FrameWork
         public MappingProfiles()
         {
             CreateMap<dictionaryRoot, dictionaryRootDto>().ReverseMap();
+            CreateMap<Aimeaning, Content>().ReverseMap();
             //CreateMap<Phonetic, Phonetic>().ReverseMap();
             //CreateMap<Meaning, Meaning>().ReverseMap();
             //CreateMap<Definition, Definition>().ReverseMap();

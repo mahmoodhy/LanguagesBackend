@@ -51,8 +51,7 @@ namespace Application.CQRS.Query
 
                     var response = await client.SendAsync(request);
                     if (!response.IsSuccessStatusCode)
-                        throw new Exception("خطا");
-                    
+                        return string.Empty;                    
                     var mp3file= await response.Content.ReadAsByteArrayAsync();
                     var base64Audio = Convert.ToBase64String(mp3file);
                     return $"data:audio/mp3;base64,{base64Audio}";

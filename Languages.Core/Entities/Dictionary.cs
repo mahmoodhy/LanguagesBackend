@@ -73,7 +73,7 @@ namespace Core.Entities
     {
         [Key]
         public int id { get; set; }
-        public int questionId { get; set; }
+        public int BoxId { get; set; }
         public string? audioFile { get; set; }
 
         public string? word { get; set; }

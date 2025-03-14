@@ -22,6 +22,7 @@ namespace Infrastructure.UnitofWork
             userBox= new UserBoxRepository(_context);
             userBoxView = new UserBoxViewRepository(_context);
             userboxstatistics = new UserBoxStatisticRepository(_context);
+            aimeanings = new AimeaningRepository(_context);
             //newline1
         }
         public IBoxDataRepository BoxData { get; private set; }
@@ -30,6 +31,7 @@ namespace Infrastructure.UnitofWork
         public IUserBoxRepository userBox { get; private set; }
         public IUserBoxViewRepository userBoxView { get; }
         public IUserBoxStatisticRepository userboxstatistics { get; private set; }
+        public IAimeaningRepository aimeanings { get; private set; }
         //newline2
 
         public int Complete()
@@ -42,5 +44,6 @@ namespace Infrastructure.UnitofWork
         }
     }
 }
+
 
 

@@ -35,6 +35,7 @@ namespace Infrastructure.DataAccess
         public DbSet<SearchedWord> searchedWords { get; set; }
         public DbSet<UserBoxView>? userBoxView { get; set; }
         public virtual DbSet<UserBoxStatistic> UserBoxStatistics { get; set; }
+        public virtual DbSet<Aimeaning> Aimeanings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -68,6 +69,14 @@ namespace Infrastructure.DataAccess
                     .ToView("UserBoxStatistics", "LeitnerBox");
 
                 entity.Property(e => e.UserName).HasMaxLength(50);
+            });
+            modelBuilder.Entity<Aimeaning>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PK_AI.Meanings");
+
+                entity.ToTable("AIMeanings", "AI");
+
+                entity.Property(e => e.Id).HasColumnName("id");
             });
         }
 

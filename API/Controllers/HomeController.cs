@@ -108,11 +108,11 @@ namespace Languages.Controllers
                     if (!System.IO.File.Exists(file))
                         await _mediator.Send(new AddaudioFile() { Word = dictionaryWord });
                     if (!System.IO.File.Exists(file))
-                        await _mediator.Send(new AddaudioFileFrom_Playht() { Word = dictionaryWord });
+                        await _mediator.Send(new AddaudioFileFrom_AI() { Word = dictionaryWord });
                 }
                 else
                 {
-                   await _mediator.Send(new AddaudioFileFrom_Playht() { Word = dictionaryWord });
+                   await _mediator.Send(new AddaudioFileFrom_AI() { Word = dictionaryWord });
                 }
                 if (dictionaryWord.GTAnswer is null)
                 {
@@ -342,9 +342,11 @@ namespace Languages.Controllers
             }
         }
         [HttpPost]        
-        public async Task<IActionResult> GetaudioFileFrom_Playht(string word)
+        public async Task<IActionResult> GetaudioFileFrom_AI(string word)
         {
-            var file = await _mediator.Send(new GetaudioFileFrom_Playht() { Word = word });
+            var file = await _mediator.Send(new GetaudioFileFrom_UnrealSpeech() { Word = word });
+            if (string.IsNullOrEmpty(file))
+                file= await _mediator.Send(new GetaudioFileFrom_Playht() { Word = word });
             return Ok(file);
         }
         [HttpPost("{boxid}")]

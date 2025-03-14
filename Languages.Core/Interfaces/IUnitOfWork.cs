@@ -14,9 +14,11 @@ namespace Core.Interfaces
         IUserBoxRepository userBox { get; }
         IUserBoxViewRepository userBoxView { get; }
         IUserBoxStatisticRepository userboxstatistics { get; }
+        IAimeaningRepository aimeanings { get; }
         //newline
         int Complete();
     }
 }
+
 
 

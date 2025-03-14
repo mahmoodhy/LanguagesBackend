@@ -22,8 +22,8 @@ builder.Services.AddCors(options =>
         builder =>
         {
             builder
-            .WithOrigins("http://localhost:3000", "http://5.75.197.85", "http://127.0.0.1"
-            ,"https://localhost:443", "https://5.75.197.85", "https://127.0.0.1")// Replace with your actual allowed origins  
+            .WithOrigins("http://localhost:3000", "http://5.75.197.85", "http://zabans.de", "https://zabans.de"
+            , "https://5.75.197.85")// Replace with your actual allowed origins  
             //.AllowAnyOrigin()    
             .AllowAnyMethod()
             .AllowAnyHeader();
@@ -77,7 +77,6 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 
-app.UseStaticFiles();
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(

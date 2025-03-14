@@ -366,3 +366,4 @@ FodyWeavers.xsd
 /API/appsettings.Development.json
 /add.bat
 /add.ps1
+/API/audioFiles
